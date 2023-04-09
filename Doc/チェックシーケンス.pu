@@ -1,0 +1,39 @@
+@startuml
+
+actor User
+participant UI
+participant MainViewModel
+participant PresetModel
+participant MonitoringModel
+
+User -> UI: 開始
+UI -> MainViewModel: 開始
+MainViewModel -> PresetModel: 対象読み込み
+PresetModel --> MainViewModel
+MainViewModel --> UI: 対象表示
+
+MainViewModel -> MainViewModel: 捕捉準備中状態に設定
+
+MainViewModel -> MonitoringModel: 参加者ウィンドウ捕捉開始
+MainViewModel -> MainViewModel: 捕捉中状態に設定
+MonitoringModel -> MonitoringModel: 捕捉待ち
+MonitoringModel --> MainViewModel: 捕捉完了
+
+MainViewModel -> MainViewModel: 監視中状態に設定
+
+MainViewModel -> MonitoringModel: 監視開始
+MonitoringModel --> MainViewModel
+
+loop
+    MonitoringModel --> MonitoringModel: 参加状態確認
+    MonitoringModel -> MainViewModel: 参加状態変更
+    MainViewModel -> UI: 参加状態更新
+
+    opt [全員参加済み]
+        MainViewModel -> MainViewModel: 完了状態に設定
+        MainViewModel -> MonitoringModel: 監視停止
+        MonitoringModel --> MainViewModel
+    end
+end
+
+@enduml
